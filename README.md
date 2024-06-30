@@ -2,6 +2,8 @@
 
 This Python script allows you to train and test a voice recognition model using Mel-Frequency Cepstral Coefficients (MFCC) and Gaussian Mixture Models (GMM).
 
+## **THIS PROJECT IS UNDER MASSIVE RECONSTRUCTION**
+
 ## Requirements
 
 The script requires the following Python libraries:
@@ -28,22 +30,24 @@ For more systems just refer to https://pypi.org/project/PyAudio/ .
 
 ## Usage
 
-The script has two main modes of operation: `--train` and `--test`.
 
-1. **Training the Model**:
+### 1. **Training the Model**:
    
    - Run the script with the `--train` argument:
+     ```python
+     python main.py 
      ```
-     python mfcc_gmm_train_test.py --train
+   - The script will prompt you to enter your name, and then record your voice for 5 seconds, 5 times by default.
+   - The recorded voice samples will be saved as WAV files in the `audio` directory.
+   - You can also specify the number of recordings and the duration of each recording using the `--num_recordings`,  `--phase` and `--duration` arguments:
+     ```python
+     python main.py --num_recordings 10 --duration 10 --phase "Test phase for several seconds."
      ```
-   - The script will prompt you to enter your name, and then record your voice for 5 seconds, 5 times.
-   - The recorded voice samples will be saved in the `train_data` directory, with a subdirectory named after your username.
-   - The script will then train a GMM model using the recorded voice samples and save the model in the `train_data` directory.
    
-2. **Testing the Model**:
+### 2. **Testing the Model**:
    - Run the script with the `--test` argument:
-     ```
-     python mfcc_gmm_train_test.py --test
+     ```python
+     python main.py -a
      ```
    - The script will prompt you to enter your name and then record your voice for 5 seconds.
    - The script will then use the trained GMM model to recognize your voice and display the recognition score.
@@ -72,7 +76,7 @@ If you run the script without any arguments, it will display a message asking yo
 ## Future Improvements
 
 - [ ] Fix recording problems:
-  - [ ] Only create one audio file after recording five times.
+  - [x] ~~Only create one audio file after recording five times.~~
   - [ ] Training process failure(TBC).
 - [ ] Implement cross-validation to optimize the GMM model parameters.
 - [ ] Explore other feature extraction techniques, such as Wavelet Transform or Deep Learning-based methods.

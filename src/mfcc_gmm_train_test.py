@@ -17,12 +17,7 @@ args = parser.parse_args()
 
 # record the user's voice for multiple times and get user name, save the voice as .wav file and train a model to recognize the user's voice with mfcc and gmm
 
-def prepare_train_data_dir(user_name):
-    if not os.path.exists("train_data"):
-        os.mkdir("train_data")
-    # create a directory to store the training data
-    if not os.path.exists("train_data" + os.sep + user_name):
-        os.mkdir("train_data" + os.sep + user_name)
+
 
 def record_voice(user_name):
     print("* recording")
@@ -31,7 +26,7 @@ def record_voice(user_name):
         CHUNK = 1024
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
-        RATE = 16000
+        RATE = 48000
         RECORD_SECONDS = 5
         p = pyaudio.PyAudio()
         stream = p.open(format=FORMAT,
