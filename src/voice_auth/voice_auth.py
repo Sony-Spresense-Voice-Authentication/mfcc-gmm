@@ -10,9 +10,9 @@ import joblib
 BASEPATH = os.path.dirname(__file__)
 
 def get_mfcc(file):
-    logging.info(f'Loading {file}')
-    y, sr = librosa.load(file)
-    logging.debug('Getting MFCC features')
+    logging.debug(f'Loading {file}')
+    y, sr = librosa.load(file, sr=None)
+    logging.debug(f'Getting MFCC features, sr: {sr}')
     # Get the MFCC features
     mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
     mfccs = sklearn.preprocessing.scale(mfcc, axis=1)
@@ -31,8 +31,8 @@ def train_gmm(user_name,paths):
     logging.debug(f'Paths: {paths}')
 
     for path in paths:
-        logging.info(f'Loading {path}')
-        y, sr = librosa.load(path)
+        logging.debug(f'Loading {path}')
+        y, sr = librosa.load(path, sr=None)
         mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
         logging.debug(f'MFCC shape for {path}: {mfcc.shape}')
         if combined_mfcc.size == 0:
@@ -54,9 +54,6 @@ def train_gmm(user_name,paths):
     
 
 def recognize_voice(user_name,mfcc):
-    # logging.info(f'Recognizing voice for {user_name}')
-    # Recognize the user's voice
-    # gmm = np.load(os.path.join(BASEPATH, f'../../audio_models/{user_name}.npy'))
     gmm = joblib.load(os.path.join(BASEPATH, f'../../audio_models/{user_name}.joblib'))
     score = gmm.score(mfcc.T)
     return score
@@ -76,10 +73,10 @@ def compare(spath):
     best_probability = None
     debug_every_model = []
     for path in model_paths:
-        # model_name = os.path.splitext(os.path.basename(path))[0]
+        # model_name = os.path.splitexlt(os.path.basename(path))[0]
         model = joblib.load(path)
         features = get_mfcc(spath)
-        ll = np.array(model.score(features)).sum()
+        ll = np.array(model.score(features.T)).sum()
 
         # if best_model is None:
         #     best_model = model_name
@@ -92,4 +89,5 @@ def compare(spath):
 
     logging.debug(debug_every_model)
     # return best_model, best_probability
+    logging.info(f'Best probability: {best_probability}')
     return best_probability

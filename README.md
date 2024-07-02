@@ -16,7 +16,8 @@ The script requires the following Python libraries:
 You can install these dependencies by running the following command when you use Windows:
 
 ```
-pip install -r requirements.txt
+pip install -r src/requirementpip.txt
+pip install pyaudio
 ```
 
 Specifically for MacOS, you should install `portaudio` before installing `PyAudio`:
@@ -32,8 +33,8 @@ For more systems just refer to https://pypi.org/project/PyAudio/ .
 
 
 ### 1. **Training the Model**:
-   
-   - Run the script with the `--train` argument:
+
+   - Run the script:
      ```python
      python main.py 
      ```
@@ -43,9 +44,9 @@ For more systems just refer to https://pypi.org/project/PyAudio/ .
      ```python
      python main.py --num_recordings 10 --duration 10 --phase "Test phase for several seconds."
      ```
-   
+
 ### 2. **Testing the Model**:
-   - Run the script with the `--test` argument:
+   - Run the script with the `-a` or `--auth` argument:
      ```python
      python main.py -a
      ```
@@ -75,10 +76,10 @@ If you run the script without any arguments, it will display a message asking yo
 
 ## Future Improvements
 
-- [ ] Fix recording problems:
-  - [x] ~~Only create one audio file after recording five times.~~
-  - [ ] Training process failure(TBC).
+- [x] Fix recording problems:
+  - [x] Only create one audio file after recording five times.
+  - [x] Training process failure(TBC).
 - [ ] Implement cross-validation to optimize the GMM model parameters.
 - [ ] Explore other feature extraction techniques, such as Wavelet Transform or Deep Learning-based methods.
 - [ ] Implement a more robust voice activity detection to improve the recording process.
-- [ ] Add support for multiple users and user-specific models.
+- [x] Add support for multiple users and user-specific models.(Not tested.)

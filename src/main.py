@@ -7,7 +7,7 @@ import voice_auth.voice_record as voice_record
 import voice_auth.voice_auth as voice_auth
 import logging
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 THRESHOLD = 0.5
 SECONDS = 5
@@ -25,38 +25,38 @@ def authenticate():
     # Get the voice recording and save to "sample.wav"
     dest = os.path.join(BASEPATH, f'../audio/sample.wav')
     print("Recording the voice for authentication..")
+    print("Please say the following phrase: ", phrase)
     
     # Record the voice for 5 seconds
     voice_record.record(dest, SECONDS)
 
-    # Get the MFCC features for the authentication
-    # mfcc = voice_auth.get_mfcc(dest)
-    
-    # # Used the trained GMM model to recognize the user's voice
-    # score = voice_auth.recognize_voice(mfcc)
-    # logging.info(f'Score: {score}')
-
+    # Read the threshold from the file
+    f = open(os.path.join(BASEPATH, 'threshold.txt'), 'r')
+    THRESHOLD = float(f.read())
+    f.close()
+    logging.debug(f'THRESHOLD: {THRESHOLD}')
 
     # Get the MFCC features for the authentication
     mfcc = voice_auth.get_mfcc(dest)
     scores = []
     for file in glob.glob(os.path.join(BASEPATH, '../audio_models/*')):
-        logging.info(f'Loading {file}')
+        logging.debug(f'Loading {file}')
         user = os.path.basename(file).split('.')[0]
-        logging.info(f'Checking {user}')
+        logging.debug(f'Checking {user}')
         score = voice_auth.recognize_voice(user,mfcc)
         scores.append((user, score))
-        logging.info(f'Score for {user}: {score}')
+        logging.debug(f'Score for {user}: {score}')
 
     # Get the user with the highest score
-    # if scores.count == 0:
-    #     utilities.break_and_signal('No scores found for the users')
-    # user, score = max(scores, key=lambda x: x[1])
-    # logging.info(f'User: {user}, Score: {score}')
-    # if score > THRESHOLD:
-    #     print(f'User {user} authenticated')
-    # else:
-    #     print('User not authenticated')
+    if scores.count == 0:
+        utilities.break_and_signal('No scores found for the users')
+    user, score = max(scores, key=lambda x: x[1])
+    logging.debug(f'User: {user}, Score: {score}')
+    logging.debug(f'THRESHOLD: {THRESHOLD}')
+    if score > THRESHOLD:
+        print(f'User {user} authenticated')
+    else:
+        print('User not authenticated')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Voice authentication')
@@ -64,12 +64,14 @@ if __name__ == "__main__":
     parser.add_argument('--threshold', type=float, default=THRESHOLD, help='Threshold for voice authentication',required=False)
     parser.add_argument('-s','--seconds', type=int, default=SECONDS, help='Seconds for voice recording',required=False)
     parser.add_argument('-p','--phrase', type=str, default=phrase, help='Phrase for voice recording',required=False)
+    parser.add_argument('-n','--num_sample', type=int, default=NUM_SAMPLE, help='Number of samples for voice recording',required=False)
+    parser.add_argument('--delete-models', action='store_false', help='Delete all the models in the audio_models directory',required=False)
+    parser.add_argument('--delete-audio', action='store_false', help='Delete all the audio files in the audio directory',required=False)
     args = parser.parse_args()
     
     if not args.auth:
         # Remove all the files in the audio_models directory
-        remove_models = False
-        if remove_models:
+        if args.remove_models:
             files = glob.glob(os.path.join(BASEPATH, '../audio_models/*'))
             if not files:
                 logging.info('No files found in the audio_models directory')
@@ -80,8 +82,7 @@ if __name__ == "__main__":
             
 
         # Remove all the files in the audio directory
-        remove_audio = False
-        if remove_audio:
+        if args.remove_audio:
             files = glob.glob(os.path.join(BASEPATH, '../audio/*'))
             for f in files:
                 logging.info(f'Removing {f}')
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         paths_modeling = []
         path_training = []
         if not os.path.exists(os.path.join(dest, f'{username}_0.wav')):
-            utilities.break_and_signal(f'No samples found for {username}')
+            logging.warning(f'No samples found for {username}')
             print("Recording the voice for " + username + "..")
             for i in range(0, int(NUM_SAMPLE // 2) + 1):
                 logging.info(f'Recording {i + 1} of {NUM_SAMPLE}')
@@ -121,6 +122,8 @@ if __name__ == "__main__":
             i = 0
             while os.path.exists(os.path.join(dest, f'{username}_{i}.wav')):
                 i += 1
+            if i == 0:
+                utilities.break_and_signal(f'No samples found for {username}')
             logging.info(f'Found {i} samples for {username}')
             for j in range(0, int(NUM_SAMPLE // 2)):
                 path = os.path.join(dest, f'{username}_{j}.wav')
@@ -143,10 +146,10 @@ if __name__ == "__main__":
         for path in path_training:
             prob = voice_auth.compare(path)
             thresholds.append(prob)
-            logging.info(f'Probability for {path}: {prob}')
+            logging.debug(f'Probability for {path}: {prob}')
 
         THRESHOLD = (sum(thresholds) / len(thresholds)) - 0.5
-        logging.debug(THRESHOLD)
+        logging.debug(f'THRESHOLD: {THRESHOLD}')
 
         f = open(os.path.join(BASEPATH, 'threshold.txt'), 'w')
         f.write(str(THRESHOLD))
