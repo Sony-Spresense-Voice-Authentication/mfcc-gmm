@@ -2,7 +2,7 @@
 
 This Python script allows you to train and test a voice recognition model using Mel-Frequency Cepstral Coefficients (MFCC) and Gaussian Mixture Models (GMM).
 
-## **THIS PROJECT IS UNDER MASSIVE RECONSTRUCTION**
+# This project is now under construction, and the model is not working properly.
 
 ## Requirements
 
@@ -36,24 +36,22 @@ For more systems just refer to https://pypi.org/project/PyAudio/ .
 
    - Run the script:
      ```python
-     python main.py 
+     python src/main.py 
      ```
    - The script will prompt you to enter your name, and then record your voice for 5 seconds, 5 times by default.
    - The recorded voice samples will be saved as WAV files in the `audio` directory.
    - You can also specify the number of recordings and the duration of each recording using the `--num_recordings`,  `--phase` and `--duration` arguments:
      ```python
-     python main.py --num_recordings 10 --duration 10 --phase "Test phase for several seconds."
+     python src/main.py --num_recordings 10 --duration 10 --phase "Test phase for several seconds."
      ```
 
 ### 2. **Testing the Model**:
    - Run the script with the `-a` or `--auth` argument:
      ```python
-     python main.py -a
+     python src/main.py -a
      ```
    - The script will prompt you to enter your name and then record your voice for 5 seconds.
    - The script will then use the trained GMM model to recognize your voice and display the recognition score.
-
-If you run the script without any arguments, it will display a message asking you to specify either `--train` or `--test`.
 
 ## How It Works
 
@@ -76,10 +74,15 @@ If you run the script without any arguments, it will display a message asking yo
 
 ## Future Improvements
 
+- [x] Add support for recording multiple voice samples for training.
+- [ ] Fix the recording process to avoid creating multiple audio files.
+- [ ] Model tuning problems:
+  - [ ] The model return every sample as authenticated.
+  - [ ] Threshold tuning.
+  - [ ] Cross-validation to optimize the GMM model parameters.
 - [x] Fix recording problems:
   - [x] Only create one audio file after recording five times.
   - [x] Training process failure(TBC).
-- [ ] Implement cross-validation to optimize the GMM model parameters.
 - [ ] Explore other feature extraction techniques, such as Wavelet Transform or Deep Learning-based methods.
 - [ ] Implement a more robust voice activity detection to improve the recording process.
 - [x] Add support for multiple users and user-specific models.(Not tested.)

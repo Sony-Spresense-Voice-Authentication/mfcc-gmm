@@ -7,7 +7,12 @@ import voice_auth.voice_record as voice_record
 import voice_auth.voice_auth as voice_auth
 import logging
 
-logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    filename='debug_authenticate_with_voice.log',
+    filemode='w'
+)
 
 THRESHOLD = 0.5
 SECONDS = 5
@@ -39,11 +44,11 @@ def authenticate():
     # Get the MFCC features for the authentication
     mfcc = voice_auth.get_mfcc(dest)
     scores = []
-    for file in glob.glob(os.path.join(BASEPATH, '../audio_models/*')):
+    for file in glob.glob(os.path.join(BASEPATH, '../audio_models/*_model.joblib')):
         logging.debug(f'Loading {file}')
-        user = os.path.basename(file).split('.')[0]
+        user = os.path.basename(file).replace('_model.joblib', '')
         logging.debug(f'Checking {user}')
-        score = voice_auth.recognize_voice(user,mfcc)
+        score = voice_auth.recognize_voice(user, mfcc)
         scores.append((user, score))
         logging.debug(f'Score for {user}: {score}')
 
@@ -60,18 +65,18 @@ def authenticate():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Voice authentication')
-    parser.add_argument('-a','--auth', action='store_true', help='Authenticate the user',required=False)
+    parser.add_argument('-t','--train', action='store_true', default=False, help='Authenticate the user',required=False)
     parser.add_argument('--threshold', type=float, default=THRESHOLD, help='Threshold for voice authentication',required=False)
     parser.add_argument('-s','--seconds', type=int, default=SECONDS, help='Seconds for voice recording',required=False)
     parser.add_argument('-p','--phrase', type=str, default=phrase, help='Phrase for voice recording',required=False)
     parser.add_argument('-n','--num_sample', type=int, default=NUM_SAMPLE, help='Number of samples for voice recording',required=False)
-    parser.add_argument('--delete-models', action='store_false', help='Delete all the models in the audio_models directory',required=False)
-    parser.add_argument('--delete-audio', action='store_false', help='Delete all the audio files in the audio directory',required=False)
+    parser.add_argument('-dm','--delete-models', action='store_true', default=False, help='Delete all the models in the audio_models directory',required=False)
+    parser.add_argument('-da','--delete-audio', action='store_true', default=False, help='Delete all the audio files in the audio directory',required=False)
     args = parser.parse_args()
     
-    if not args.auth:
+    if args.train:
         # Remove all the files in the audio_models directory
-        if args.remove_models:
+        if args.delete_models:
             files = glob.glob(os.path.join(BASEPATH, '../audio_models/*'))
             if not files:
                 logging.info('No files found in the audio_models directory')
@@ -82,7 +87,7 @@ if __name__ == "__main__":
             
 
         # Remove all the files in the audio directory
-        if args.remove_audio:
+        if args.delete_audio:
             files = glob.glob(os.path.join(BASEPATH, '../audio/*'))
             for f in files:
                 logging.info(f'Removing {f}')
@@ -99,7 +104,7 @@ if __name__ == "__main__":
         if not os.path.exists(os.path.join(dest, f'{username}_0.wav')):
             logging.warning(f'No samples found for {username}')
             print("Recording the voice for " + username + "..")
-            for i in range(0, int(NUM_SAMPLE // 2) + 1):
+            for i in range(0, int(NUM_SAMPLE // 2)):
                 logging.info(f'Recording {i + 1} of {NUM_SAMPLE}')
                 print("Please say the following phrase: ", phrase)
                 prompt = input("Press enter to start recording.")
@@ -109,7 +114,7 @@ if __name__ == "__main__":
                 paths_modeling.append(path)
 
             print("Recording the voice for " + username + "..")
-            for i in range(int(NUM_SAMPLE // 2) + 1, NUM_SAMPLE):
+            for i in range(int(NUM_SAMPLE // 2), NUM_SAMPLE):
                 logging.info(f'Recording {i + 1} of {NUM_SAMPLE}')
                 print("Please say the following phrase: ", phrase)
                 prompt = input("Press enter to start recording.")
@@ -130,7 +135,7 @@ if __name__ == "__main__":
                 logging.debug(f'Loading {path} to modeling set')
                 paths_modeling.append(path)
             logging.debug(f'Paths modeling: {paths_modeling}')
-            for j in range(int(NUM_SAMPLE // 2) + 1, i):
+            for j in range(int(NUM_SAMPLE // 2), i):
                 path = os.path.join(dest, f'{username}_{j}.wav')
                 logging.debug(f'Loading {path} to training set')
                 path_training.append(path)

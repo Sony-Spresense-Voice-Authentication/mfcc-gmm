@@ -6,7 +6,7 @@ import wave
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
-RATE = 48000
+RATE = 8000
 
 
 def record(path, RECORD_SECONDS=5):
