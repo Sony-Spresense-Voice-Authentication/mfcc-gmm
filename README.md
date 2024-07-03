@@ -16,7 +16,7 @@ The script requires the following Python libraries:
 You can install these dependencies by running the following command when you use Windows:
 
 ```
-pip install -r src/requirementpip.txt
+pip install -r src/requirements.txt
 pip install pyaudio
 ```
 
