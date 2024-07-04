@@ -21,14 +21,14 @@ NUM_SAMPLE = 6
 phrase = 'The quick fox jumps nightly above the wizard'
 
 # Check if the audio directory exists
-utilities.check_folder(os.path.join(BASEPATH, f'..{os.path.sep}audio'))
-utilities.check_folder(os.path.join(BASEPATH, f'..{os.path.sep}audio_models'))
+utilities.check_folder(os.path.join(BASEPATH, f'../audio'))
+utilities.check_folder(os.path.join(BASEPATH, f'../audio_models'))
 
 # functions to record the voice and authenticate the user
 def authenticate():
     # Authenticate the user
     # Get the voice recording and save to "sample.wav"
-    dest = os.path.join(BASEPATH, f'..{os.path.sep}audio{os.path.sep}sample.wav')
+    dest = os.path.join(BASEPATH, f'../audio/sample.wav')
     print("Recording the voice for authentication..")
     print("Please say the following phrase: ", phrase)
     
@@ -44,7 +44,7 @@ def authenticate():
     # Get the MFCC features for the authentication
     mfcc = voice_auth.get_mfcc(dest)
     scores = []
-    for file in glob.glob(os.path.join(BASEPATH, f'..{os.path.sep}audio_models{os.path.sep}*_model.joblib')):
+    for file in glob.glob(os.path.join(BASEPATH, '../audio_models/*_model.joblib')):
         logging.debug(f'Loading {file}')
         user = os.path.basename(file).replace('_model.joblib', '')
         logging.debug(f'Checking {user}')
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     if args.train:
         # Remove all the files in the audio_models directory
         if args.delete_models:
-            files = glob.glob(os.path.join(BASEPATH, f'..{os.path.sep}audio_models{os.path.sep}*'))
+            files = glob.glob(os.path.join(BASEPATH, '../audio_models/*'))
             if not files:
                 logging.info('No files found in the audio_models directory')
             else:
@@ -88,13 +88,13 @@ if __name__ == "__main__":
 
         # Remove all the files in the audio directory
         if args.delete_audio:
-            files = glob.glob(os.path.join(BASEPATH, f'..{os.path.sep}audio{os.path.sep}*'))
+            files = glob.glob(os.path.join(BASEPATH, '../audio/*'))
             for f in files:
                 logging.info(f'Removing {f}')
                 os.remove(f)
             
 
-        dest = os.path.join(BASEPATH, f'..{os.path.sep}audio')
+        dest = os.path.join(BASEPATH, f'../audio')
         phrase = args.phrase if args.phrase else phrase
         username = input('Please input your username: ')
         # utilities.check_folder(username)

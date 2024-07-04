@@ -1,3 +1,5 @@
 librosa
-numpy
+numpy<2
 scikit-learn
+noisereduce
+
