@@ -8,12 +8,18 @@ import sklearn.mixture
 import joblib
 from sklearn.preprocessing import RobustScaler
 from sklearn.pipeline import Pipeline
+import noisereduce as nr
 
 BASEPATH = os.path.dirname(__file__)
 
 n_mfcc = 19
 
-
+# Noise redunction
+def noise_reducion(file_path):
+    logging.info(f'Reducing noise for {file_path}')
+    data, rate = librosa.load(file_path)
+    noise_reduced = nr.reduce_noise(y=data, sr=rate)
+    return noise_reduced
 
 def get_mfcc(file):
     logging.debug(f'Loading {file}')
@@ -25,7 +31,7 @@ def get_mfcc(file):
 
 def train_gmm(user_name, paths):
     logging.info(f'Training GMM for {user_name}')
-    dest = os.path.join(BASEPATH, f'../audio_models')
+    dest = os.path.join(BASEPATH, f'..{os.path.sep}audio_models')
     combined_mfcc = np.asarray([])
 
     for path in paths:
@@ -45,12 +51,13 @@ def train_gmm(user_name, paths):
         scaler = RobustScaler()
         preprocessed_mfcc = scaler.fit_transform(combined_mfcc.T).T
         
-        gmm = sklearn.mixture.GaussianMixture(n_components=1, max_iter=200, covariance_type='diag', n_init=3)
+        logging.debug(f'#samples:{len(path)}')
+        gmm = sklearn.mixture.GaussianMixture(n_components=len(path), max_iter=200, covariance_type='diag', n_init=3)
         gmm.fit(preprocessed_mfcc.T)
         
         # Save both the GMM model and the scaler
-        model_path = os.path.join(BASEPATH, f'../../audio_models/{user_name}_model.joblib')
-        scaler_path = os.path.join(BASEPATH, f'../../audio_models/{user_name}_scaler.joblib')
+        model_path = os.path.join(BASEPATH, f'..{os.path.sep}..{os.path.sep}audio_models{os.path.sep}{user_name}_model.joblib')
+        scaler_path = os.path.join(BASEPATH, f'..{os.path.sep}..{os.path.sep}audio_models{os.path.sep}{user_name}_scaler.joblib')
         
         joblib.dump(gmm, model_path)
         joblib.dump(scaler, scaler_path)
@@ -61,8 +68,8 @@ def train_gmm(user_name, paths):
         return False
 
 def recognize_voice(user_name, mfcc):
-    model_path = os.path.join(BASEPATH, f'../../audio_models/{user_name}_model.joblib')
-    scaler_path = os.path.join(BASEPATH, f'../../audio_models/{user_name}_scaler.joblib')
+    model_path = os.path.join(BASEPATH, f'..{os.path.sep}..{os.path.sep}audio_models{os.path.sep}{user_name}_model.joblib')
+    scaler_path = os.path.join(BASEPATH, f'..{os.path.sep}..{os.path.sep}audio_models{os.path.sep}{user_name}_scaler.joblib')
     
     gmm = joblib.load(model_path)
     scaler = joblib.load(scaler_path)
@@ -89,7 +96,7 @@ def compare(spath):
     Parameters:
     spath: str              - path of WAV file to compare
     """
-    models_src = os.path.join(BASEPATH, '../../audio_models')
+    models_src = os.path.join(BASEPATH, f'..{os.path.sep}..{os.path.sep}audio_models')
     model_paths = [os.path.join(models_src, fname) for fname in
         os.listdir(models_src) if fname.endswith('_model.joblib')]
 
