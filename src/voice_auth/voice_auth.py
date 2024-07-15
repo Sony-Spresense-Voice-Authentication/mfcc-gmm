@@ -51,6 +51,7 @@ def get_voice_features(rate, data):
 
 
 # TODO: improve the scaling and accuracy of the model -> wordlists? better word distribition? bg noise filtering?
+# noinspection PyPackageRequirements
 def build_model(name, paths):
     """ Builds Gaussian Mixture Model from features of each WAV file in paths collection
     Parameters:

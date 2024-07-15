@@ -80,7 +80,8 @@ if __name__ == '__main__':
     if not args.auth:
         # files = glob.glob(os.path.join(BASEPATH, '../audio_models/*'))
         # for f in files:
-            # os.remove(f)
+        #     os.remove(f)
+
 
         dest = os.path.join(BASEPATH, f'../audio')
         phrase = args.phrase if args.phrase else phrase
@@ -89,25 +90,42 @@ if __name__ == '__main__':
 
         paths_modelling = []
         print("Please say the phrase:", phrase)
-        for i in range(1, NUM_SAMPLE//2 + 1):
-            promp = input('Press enter to record... ')
-            path = os.path.join(dest, username + str(i) + '.wav')
-            voice_record.record(path, SECONDS)
-            paths_modelling.append(path)
+        if os.path.exists(os.path.join(dest, f'{username}1.wav')):
+            for i in range (1, NUM_SAMPLE//2 + 1):
+                path = os.path.join(dest, f'../audio/{username}1.wav')
+
+                paths_modelling.append(path)
+        else:
+            for i in range(1, NUM_SAMPLE//2 + 1):
+                promp = input('Press enter to record... ')
+
+                path = os.path.join(dest, username + str(i) + '.wav')
+                voice_record.record(path, SECONDS)
+                paths_modelling.append(path)
+        # logging.info(f"Path Modeling: $s", paths_modelling )
+        print(f'Path Modeling: $s', paths_modelling)
 
         paths_training = []
         print("Please say the phrase:", phrase)
-        for i in range(4, int(NUM_SAMPLE) + 1):
-            promp = input('Press enter to record... ')
-            path = os.path.join(dest, username + str(i) + '.wav')
-            voice_record.record(path, SECONDS)
-            paths_training.append(path)
+        if os.path.exists(os.path.join(dest, f'{username}{NUM_SAMPLE//2 + 2}.wav')):
+            for i in range(4, int(NUM_SAMPLE) + 1):
+                path = os.path.join(dest, f'{username}{i}.wav')
+                paths_training.append(path)
+        else:
+            for i in range(4, int(NUM_SAMPLE) + 1):
+                promp = input('Press enter to record... ')
+                path = os.path.join(dest, username + str(i) + '.wav')
+                voice_record.record(path, SECONDS)
+                paths_training.append(path)
+        # logging.info(f"Path Training: $s", paths_training)
+        print(f'Path Training: $s', paths_training)
 
         voice_auth.build_model(username, paths_modelling)
 
         thresholds = []
         for path in paths_training:
             model, prob = voice_auth.compare(path)
+            print(f"{model}, {prob}")
             thresholds.append(prob)
 
         THRESHOLD = (sum(thresholds) / len(thresholds)) - 0.5
