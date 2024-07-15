@@ -1,0 +1,3 @@
+[submodule "fast-gmm"]
+	path = fast-gmm
+	url = https://github.com/zxytim/fast-gmm
