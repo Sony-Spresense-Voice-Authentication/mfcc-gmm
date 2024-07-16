@@ -82,13 +82,13 @@ def build_model(name, paths):
         return False
 
 
-def compare(path):
+def compare(username,path):
     """ Compares audio features against all models to find closest match above given threshold
     Parameters:
     paths: str              - path of WAV file to compare
     threshold: num          - threshold for match, negative log likelihood
     """
-    models_src = os.path.join(BASEPATH, '../../audio_models')
+    models_src = os.path.join(BASEPATH, f'../../audio_models/{username}')
     model_paths = [os.path.join(models_src, fname) for fname in
         os.listdir(models_src) if fname.endswith('.gmm')]
 

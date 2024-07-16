@@ -46,7 +46,7 @@ def authenticate():
         username = files.split('/')[-1]
         logging.info(username)
 
-        f_threshold = open(os.path.join(files, f'/{username}/threshold.txt'), 'r')
+        f_threshold = open(os.path.join(files, f'{username}/threshold.txt'), 'r')
         THRESHOLD = float(f_threshold.read())
         f_threshold.close()
         logging.info(THRESHOLD)
@@ -124,14 +124,14 @@ if __name__ == '__main__':
 
         thresholds = []
         for path in paths_training:
-            model, prob = voice_auth.compare(path)
+            model, prob = voice_auth.compare(username,path)
             print(f"{model}, {prob}")
             thresholds.append(prob)
 
         THRESHOLD = (sum(thresholds) / len(thresholds)) - 0.5
         logging.debug(THRESHOLD)
 
-        f = open(os.path.join(BASEPATH, f'/../audio_models/{username}/threshold.txt'), 'w')
+        f = open(os.path.join(BASEPATH, f'../audio_models/{username}/threshold.txt'), 'w')
         f.write(str(THRESHOLD))
         f.close()
 
