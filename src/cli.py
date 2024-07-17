@@ -21,6 +21,7 @@ phrase = 'The quick fox jumps nightly above the wizard'
 
 ut.check_folder(os.path.join(BASEPATH, f'../audio'))
 ut.check_folder(os.path.join(BASEPATH, f'../audio_models'))
+ut.check_folder(os.path.join(BASEPATH, f'../threshold'))
 
 def authenticate():
     # f = open(os.path.join(BASEPATH, 'threshold.txt'), 'r')
@@ -39,14 +40,17 @@ def authenticate():
 
     # read multiple users
     score = []
-    model_path = os.path.join(BASEPATH, '/../audio_models')
-    path = os.path.join(BASEPATH, '../audio/compare.wav')
+    model_path = os.path.join(BASEPATH, '../audio_models')
+    print("model path: %s", model_path)
+    path = os.path.join(BASEPATH, '..audio/compare.wav')
 
     for files in model_path:
-        username = files.split('/')[-1]
+        print("File path: %s", files)
+        continue
+        username = files.split('/')[-1].split('.')[0]
         logging.info(username)
 
-        f_threshold = open(os.path.join(files, f'{username}/threshold.txt'), 'r')
+        f_threshold = open(os.path.join(BASEPATH, f'threshold/{username}.txt'), 'r')
         THRESHOLD = float(f_threshold.read())
         f_threshold.close()
         logging.info(THRESHOLD)
@@ -86,7 +90,7 @@ if __name__ == '__main__':
         dest = os.path.join(BASEPATH, f'../audio')
         phrase = args.phrase if args.phrase else phrase
         username = input('Please input your username: ')
-        ut.check_folder(os.path.join(BASEPATH, f'../audio_models/{username}'))
+        # ut.check_folder(os.path.join(BASEPATH, f'../audio_models/{username}'))
 
         paths_modelling = []
         print("Please say the phrase:", phrase)
@@ -131,7 +135,7 @@ if __name__ == '__main__':
         THRESHOLD = (sum(thresholds) / len(thresholds)) - 0.5
         logging.debug(THRESHOLD)
 
-        f = open(os.path.join(BASEPATH, f'../audio_models/{username}/threshold.txt'), 'w')
+        f = open(os.path.join(BASEPATH, f'../threshold/{username}.txt'), 'w')
         f.write(str(THRESHOLD))
         f.close()
 

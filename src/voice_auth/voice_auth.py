@@ -74,8 +74,8 @@ def build_model(name, paths):
         gmm = sklearn.mixture.GaussianMixture(
             n_components=len(paths), max_iter=200, covariance_type='diag', n_init=3)
         gmm.fit(voice_features)
-        pickle.dump(gmm, open(os.path.join(dest, name + '/model.gmm'), 'wb')) # models are placed in
-        # src/../audio_models/{name}/model.gmm
+        pickle.dump(gmm, open(os.path.join(dest, name + '.gmm'), 'wb')) # models are placed in
+        # src/../audio_models/{name}.gmm
         return True
     else:
         logging.warning(" NO FEATURES")
@@ -88,7 +88,7 @@ def compare(username,path):
     paths: str              - path of WAV file to compare
     threshold: num          - threshold for match, negative log likelihood
     """
-    models_src = os.path.join(BASEPATH, f'../../audio_models/{username}')
+    models_src = os.path.join(BASEPATH, f'../../audio_models/')
     model_paths = [os.path.join(models_src, fname) for fname in
         os.listdir(models_src) if fname.endswith('.gmm')]
 
